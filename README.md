@@ -9,6 +9,7 @@ Merge the sourcemod folder from the download with your server's sourcemod folder
 Inside sourcemod/configs/cvarenf.cfg, you can list cvars and the values you expect. Here is an example:
 
 ## Example
+```
 sv_full_alltalk 1
 sv_deadtalk 1
 sv_alltalk 1
@@ -38,6 +39,7 @@ sv_enablebunnyhopping 1
 bot_controllable 0
 mp_ignore_round_win_conditions 1
 sv_allow_thirdperson 1
+```
 
 ## Note
 It's okay to have quotes, the plugin will ignore them. Right now I'm not entirely sure that the way I'm reading the cvarenf.cfg file is the proper way to do it, but from my experience with the file system it should be okay I think 
