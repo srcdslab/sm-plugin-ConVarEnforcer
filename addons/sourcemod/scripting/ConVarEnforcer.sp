@@ -8,7 +8,9 @@
 #undef REQUIRE_PLUGIN
 #include <adminmenu>
 
-public Plugin:myinfo = 
+#pragma newdecls required
+
+public Plugin myinfo = 
 {
 	name        = "ConVar Enforcer",
 	author      = "blacky",
@@ -210,7 +212,7 @@ void EnforceConVar(const char[] sCvar, const char[] sValue)
 	}
 }
 
-public Native_Enforce(Handle plugin, int numParams)
+public int Native_Enforce(Handle plugin, int numParams)
 {
 	char sCvar[128];
 	GetNativeString(1, sCvar, sizeof(sCvar));
@@ -219,9 +221,10 @@ public Native_Enforce(Handle plugin, int numParams)
 	GetNativeString(2, sValue, sizeof(sValue));
 	
 	EnforceConVar(sCvar, sValue);
+	return 0;
 }
 
-public Native_Unenforce(Handle plugin, int numParams)
+public any Native_Unenforce(Handle plugin, int numParams)
 {
 	char sCvar[128];
 	GetNativeString(1, sCvar, sizeof(sCvar));
@@ -244,7 +247,7 @@ public Native_Unenforce(Handle plugin, int numParams)
 	return idx != -1;
 }
 
-public Native_IsEnforced(Handle plugin, int numParams)
+public any Native_IsEnforced(Handle plugin, int numParams)
 {
 	char sCvar[128];
 	GetNativeString(1, sCvar, sizeof(sCvar));
