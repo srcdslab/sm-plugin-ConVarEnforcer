@@ -3,7 +3,7 @@
 #include <sdktools>
 #include <ConVarEnforcer>
 
-#define VERSION "1.0"
+#define VERSION "1.1"
 
 #undef REQUIRE_PLUGIN
 #include <adminmenu>
@@ -20,7 +20,7 @@ public Plugin:myinfo =
 ArrayList g_hCvarList;
 ArrayList g_hValueList;
 
-Handle g_hAdminMenu;
+TopMenu g_hAdminMenu;
 
 ConVar g_hCvarEnfEnabled;
 bool g_bCvarEnfEnabled;
@@ -29,7 +29,7 @@ public void OnPluginStart()
 {
 	CreateConVar("cvarenf_version", VERSION, "ConVar Enforcer version", FCVAR_NOTIFY|FCVAR_REPLICATED);
 	g_hCvarEnfEnabled = CreateConVar("cvarenf_enable", "1", "Enables ConVar Enforcer.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
-	HookConVarChange(g_hCvarEnfEnabled, OnCvarEnfEnabledChanged);
+	g_hCvarEnfEnabled.AddChangeHook(OnCvarEnfEnabledChanged);
 	
 	g_hCvarList = new ArrayList(ByteCountToCells(256));
 	g_hValueList = new ArrayList(ByteCountToCells(256));
@@ -37,7 +37,7 @@ public void OnPluginStart()
 	EnforceAllCvars(0);
 	
 	TopMenu topmenu;
-	if (LibraryExists("adminmenu") && ((topmenu = GetAdminTopMenu()) != INVALID_HANDLE))
+	if (LibraryExists("adminmenu") && ((topmenu = GetAdminTopMenu()) != null))
 	{
 		OnAdminMenuReady(topmenu);
 	}
@@ -45,12 +45,12 @@ public void OnPluginStart()
 
 public void OnCvarEnfEnabledChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-	g_bCvarEnfEnabled = GetConVarBool(convar);
+	g_bCvarEnfEnabled = convar.BoolValue;
 }
 
 public void OnConfigsExecuted()
 {
-	g_bCvarEnfEnabled = GetConVarBool(g_hCvarEnfEnabled);
+	g_bCvarEnfEnabled = g_hCvarEnfEnabled.BoolValue;
 }
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
@@ -65,7 +65,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public void OnLibraryRemoved(const char[] name)
 {
 	if (StrEqual(name, "adminmenu"))
-		g_hAdminMenu = INVALID_HANDLE;
+		g_hAdminMenu = null;
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -73,7 +73,7 @@ public void OnLibraryAdded(const char[] name)
 	if (StrEqual(name, "adminmenu"))
 	{
 		TopMenu topmenu;
-		if((topmenu = GetAdminTopMenu()) != INVALID_HANDLE)
+		if((topmenu = GetAdminTopMenu()) != null)
 		{
 			OnAdminMenuReady(topmenu);
 		}
@@ -85,9 +85,9 @@ public void OnAdminMenuReady(Handle topmenu)
 	if (topmenu == g_hAdminMenu)
 		return;
 
-	g_hAdminMenu = topmenu;
-	TopMenuObject serverCmds = FindTopMenuCategory(g_hAdminMenu, ADMINMENU_SERVERCOMMANDS);
-	AddToTopMenu(g_hAdminMenu, "reloadcvars", TopMenuObject_Item, TopMenuHandler, serverCmds, "reloadcvars", ADMFLAG_CONFIG);
+	g_hAdminMenu = TopMenu.FromHandle(topmenu);
+	TopMenuObject serverCmds = g_hAdminMenu.FindCategory(ADMINMENU_SERVERCOMMANDS);
+	g_hAdminMenu.AddItem("reloadcvars", TopMenuHandler, serverCmds, "reloadcvars", ADMFLAG_CONFIG);
 }
 
 public void TopMenuHandler(TopMenu topmenu, TopMenuAction action, TopMenuObject object_id, int param, char[] buffer, int maxlength)
@@ -106,35 +106,35 @@ public void EnforceAllCvars(int client)
 	
 	if(FileExists(sPath))
 	{
-		Handle hFile = OpenFile(sPath, "r");
+		File hFile = OpenFile(sPath, "r");
 		
 		if(hFile != null)
 		{		
 			// Unhook convar changes in case the cvarenf.cfg is being reloaded 
 			char sCvar[256];
-			int iSize = GetArraySize(g_hCvarList);
+			int iSize = g_hCvarList.Length;
 			ConVar c;
 			for(int idx; idx < iSize; idx++)
 			{
-				GetArrayString(g_hCvarList, idx, sCvar, sizeof(sCvar));
+				g_hCvarList.GetString(idx, sCvar, sizeof(sCvar));
 				
 				c = FindConVar(sCvar);
 				
 				if(c != null)
 				{
-					UnhookConVarChange(c, OnConVarChanged);
+					c.RemoveChangeHook(OnConVarChanged);
 					delete c;
 				}
 			}
 			
-			ClearArray(g_hCvarList);
-			ClearArray(g_hValueList);
+			g_hCvarList.Clear();
+			g_hValueList.Clear();
 			
 			// Reload cvarenf.cfg
 			char sLine[256], sLineExploded[2][256];
-			while(!IsEndOfFile(hFile))
+			while(!hFile.EndOfFile())
 			{
-				ReadFileLine(hFile, sLine, sizeof(sLine))
+				hFile.ReadLine(sLine, sizeof(sLine))
 				if(strlen(sLine) > 0)
 				{
 					ReplaceString(sLine, sizeof(sLine), "\n", "");
@@ -171,14 +171,14 @@ public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] n
 	char sCvarName[256], sCvarListCvar[256], sValue[256];
 	convar.GetName(sCvarName, sizeof(sCvarName));
 	
-	int iSize = GetArraySize(g_hCvarList);
+	int iSize = g_hCvarList.Length;
 	for(int idx; idx < iSize; idx++)
 	{
-		GetArrayString(g_hCvarList, idx, sCvarListCvar, sizeof(sCvarListCvar));
+		g_hCvarList.GetString(idx, sCvarListCvar, sizeof(sCvarListCvar));
 		
 		if(StrEqual(sCvarName, sCvarListCvar))
 		{
-			GetArrayString(g_hValueList, idx, sValue, sizeof(sValue));
+			g_hValueList.GetString(idx, sValue, sizeof(sValue));
 			
 			if(!StrEqual(newValue, sValue))
 			{
@@ -194,10 +194,10 @@ void EnforceConVar(const char[] sCvar, const char[] sValue)
 	
 	if(c != null)
 	{
-		HookConVarChange(c, OnConVarChanged);
+		c.AddChangeHook(OnConVarChanged);
 		
-		PushArrayString(g_hCvarList, sCvar);
-		PushArrayString(g_hValueList, sValue);
+		g_hCvarList.PushString(sCvar);
+		g_hValueList.PushString(sValue);
 		
 		char sCurrentValue[128];
 		c.GetString(sCurrentValue, sizeof(sCurrentValue));
@@ -226,19 +226,19 @@ public Native_Unenforce(Handle plugin, int numParams)
 	char sCvar[128];
 	GetNativeString(1, sCvar, sizeof(sCvar));
 	
-	int idx = FindStringInArray(g_hCvarList, sCvar);
+	int idx = g_hCvarList.FindString(sCvar);
 	
 	if(idx != -1)
 	{
 		ConVar c = FindConVar(sCvar);
 		if(c != null)
 		{
-			UnhookConVarChange(FindConVar(sCvar), OnConVarChanged);
+			FindConVar(sCvar).RemoveChangeHook(OnConVarChanged);
 			delete c;
 		}
 		
-		RemoveFromArray(g_hCvarList, idx);
-		RemoveFromArray(g_hValueList, idx);
+		g_hCvarList.Erase(idx);
+		g_hValueList.Erase(idx);
 	}
 	
 	return idx != -1;
@@ -249,7 +249,7 @@ public Native_IsEnforced(Handle plugin, int numParams)
 	char sCvar[128];
 	GetNativeString(1, sCvar, sizeof(sCvar));
 	
-	int idx = FindStringInArray(g_hCvarList, sCvar);
+	int idx = g_hCvarList.FindString(sCvar);
 	
 	return idx != -1;
 }
