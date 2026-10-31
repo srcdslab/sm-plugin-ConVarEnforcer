@@ -3,7 +3,7 @@
 #include <sdktools>
 #include <ConVarEnforcer>
 
-#define VERSION "1.1"
+#define VERSION "1.1.1"
 
 #undef REQUIRE_PLUGIN
 #include <adminmenu>
@@ -29,6 +29,8 @@ bool g_bCvarEnfEnabled;
 
 public void OnPluginStart()
 {
+	LoadTranslations("ConVarEnforcer.phrases");
+
 	CreateConVar("cvarenf_version", VERSION, "ConVar Enforcer version", FCVAR_NOTIFY|FCVAR_REPLICATED);
 	g_hCvarEnfEnabled = CreateConVar("cvarenf_enable", "1", "Enables ConVar Enforcer.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hCvarEnfEnabled.AddChangeHook(OnCvarEnfEnabledChanged);
@@ -95,7 +97,7 @@ public void OnAdminMenuReady(Handle topmenu)
 public void TopMenuHandler(TopMenu topmenu, TopMenuAction action, TopMenuObject object_id, int param, char[] buffer, int maxlength)
 {
 	if (action == TopMenuAction_DisplayOption)
-		Format(buffer, maxlength, "Reload cvarenf.cfg");
+		Format(buffer, maxlength, "%T", "Menu Reload Cfg", param);
 
 	else if (action == TopMenuAction_SelectOption)
 		EnforceAllCvars(param);
@@ -148,18 +150,18 @@ public void EnforceAllCvars(int client)
 				}
 			}
 			
-			ReplyToCommand(client, "[SM] cvarenf.cfg reloaded.");
+			ReplyToCommand(client, "[SM] %t", "Cfg Reloaded");
 			
 			delete hFile;
 		}
 		else
 		{
-			ReplyToCommand(client, "[SM] cvarenf.cfg could not be opened.");
+			ReplyToCommand(client, "[SM] %t", "Cfg Open Failed");
 		}
 	}
 	else
 	{
-		ReplyToCommand(client, "[SM] configs/cvarenf.cfg was not found.");
+		ReplyToCommand(client, "[SM] %t", "Cfg Not Found");
 	}
 }
 

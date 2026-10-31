@@ -1,0 +1,43 @@
+"Phrases"
+{
+	"Menu Reload Cfg"
+	{
+		"en"		"Reload cvarenf.cfg"
+		"fr"		"Recharger cvarenf.cfg"
+		"ru"		"Перезагрузить cvarenf.cfg"
+		"es"		"Recargar cvarenf.cfg"
+		"de"		"cvarenf.cfg neu laden"
+		"pt"		"Recarregar cvarenf.cfg"
+		"chi"		"重新加载 cvarenf.cfg"
+	}
+	"Cfg Reloaded"
+	{
+		"en"		"cvarenf.cfg reloaded."
+		"fr"		"cvarenf.cfg rechargé."
+		"ru"		"cvarenf.cfg перезагружен."
+		"es"		"cvarenf.cfg recargado."
+		"de"		"cvarenf.cfg neu geladen."
+		"pt"		"cvarenf.cfg recarregado."
+		"chi"		"cvarenf.cfg 已重新加载。"
+	}
+	"Cfg Open Failed"
+	{
+		"en"		"cvarenf.cfg could not be opened."
+		"fr"		"Impossible d'ouvrir cvarenf.cfg."
+		"ru"		"Не удалось открыть cvarenf.cfg."
+		"es"		"No se pudo abrir cvarenf.cfg."
+		"de"		"cvarenf.cfg konnte nicht geöffnet werden."
+		"pt"		"Não foi possível abrir cvarenf.cfg."
+		"chi"		"无法打开 cvarenf.cfg。"
+	}
+	"Cfg Not Found"
+	{
+		"en"		"configs/cvarenf.cfg was not found."
+		"fr"		"configs/cvarenf.cfg est introuvable."
+		"ru"		"configs/cvarenf.cfg не найден."
+		"es"		"No se encontró configs/cvarenf.cfg."
+		"de"		"configs/cvarenf.cfg wurde nicht gefunden."
+		"pt"		"configs/cvarenf.cfg não foi encontrado."
+		"chi"		"未找到 configs/cvarenf.cfg。"
+	}
+}
