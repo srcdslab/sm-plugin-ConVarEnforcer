@@ -3,7 +3,7 @@
 #include <sdktools>
 #include <ConVarEnforcer>
 
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 
 #undef REQUIRE_PLUGIN
 #include <adminmenu>
@@ -64,6 +64,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("Cvar_IsEnforced", Native_IsEnforced);
 	
 	RegPluginLibrary("cvarenf");
+
+	return APLRes_Success;
 }
 
 public void OnLibraryRemoved(const char[] name)
