@@ -3,7 +3,7 @@
 #include <sdktools>
 #include <ConVarEnforcer>
 
-#define VERSION "1.1.2"
+#define VERSION "1.1.3"
 
 #undef REQUIRE_PLUGIN
 #include <adminmenu>
